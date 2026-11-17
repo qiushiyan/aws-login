@@ -13,7 +13,7 @@ the design; read it before changing behaviour.
   `identity:` line, `--status`, `--renew` and the stamp file →
   the Codex automation's prompt on the laptop
   (`~/.codex/automations/refresh-planlab-prod-aws-sso/automation.toml`,
-  untracked) and `~/dotfiles/docs/aws-sso.md`. Pinned by `TestCompat`
+  untracked), described in `README.md` § Machines. Pinned by `TestCompat`
   (`cmd/aws-login/testdata/compat`). A change to one updates its consumers in
   the same pass.
 - **A profile that already gets credentials is never signed out.** Profiles

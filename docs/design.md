@@ -1,21 +1,43 @@
 # aws-login's design
 
+## Three clocks, and which one a sign-in resets
+
+- **Access token** (`~/.aws/sso/cache/<hash>.json`, `expiresAt`): one hour.
+  The CLI refreshes it on its own with the cached `refreshToken`, which is
+  why the file's `expiresAt` is always about an hour ahead of its mtime and
+  says nothing about when the sign-in ends.
+- **Identity Center session** (AWS calls it the user interactive session):
+  8 hours by default, 15 minutes to 90 days at the admin's choice; planlab's
+  is 8 hours and not ours to change. Refresh works only while it lives; when
+  it ends, the next refresh fails and every profile on the `sso-session`
+  needs a new sign-in. This is the clock that forces the daily sign-ins.
+- **Role credentials** (`~/.aws/cli/cache/`, from the permission set):
+  issued per profile, up to 12 hours, and they keep working after the
+  session ends.
+
+`aws sso login` alone does **not** restart the second clock while the
+browser is still signed in to the access portal: "If you already have an
+active session, the existing session is reused and expires when the
+existing session expires." A login that only shows "Allow access" hands the
+CLI a new token on the old session, and the 8 hours still run from the first
+sign-in. `aws sso logout` ends the session on AWS's side, so the sign-in
+after it is a real one, with the full duration. Sources, read 2026-09-28:
+the AWS CLI user guide `cli-configure-sso-concepts` (the reuse rule) and the
+SSO Portal API `Logout` reference (the server-side end).
+
 ## The decision it makes
 
-An Identity Center session is shared by every profile on its
-`[sso-session]`, and it has a fixed length that the organisation sets
-(8 hours). A run asks one question first: does the named profile get
-credentials (`aws sts get-caller-identity`)? If so, the session is alive and
-the run reports it, signing nothing in or out. If not, or with `--renew`, it
-runs `aws sso logout`, `aws sso login`, verifies, and stamps the sign-in
-time.
+A run asks one question first: does the named profile get credentials
+(`aws sts get-caller-identity`)? If so, the session is alive and the run
+reports it, signing nothing in or out. If not, or with `--renew`, it runs
+`aws sso logout`, `aws sso login`, verifies, and stamps the sign-in time.
 
-The sign-out comes before every sign-in because `aws sso login` alone reuses
-a live session, and the new token inherits that session's end. The sign-out
-ends the session on AWS's side, so the sign-in after it starts a full one.
-The cost is that every profile on the session has no credentials between the
-two, and none at all if the sign-in fails; that is why a profile that
-already works is left alone.
+The sign-out precedes every sign-in, since it is what restarts the session
+clock. Its cost is that every profile on the session has no credentials
+between the two, and none at all if the sign-in fails. A profile that
+already works is therefore left alone: the planlab profiles share one
+session, and signing in to a second account must not sign the first one
+out. A renewal is asked for by name, with `--renew`.
 
 `internal/signin` owns that decision and the stamp
 (`$XDG_STATE_HOME/aws-login/<sso-session>`, Unix seconds and a newline, one
@@ -24,9 +46,8 @@ the only code that runs `aws`. `cmd/aws-login` translates flags.
 
 ## Contracts
 
-The laptop's Codex automation runs `aws-login --status`, and
-`aws-login --renew` when less than 2 hours remain, and reads the exit code
-and the `identity:` line. `TestCompat` pins stdout, stderr, the exit code,
+The laptop's Codex automation (`README.md` § Machines says what it runs)
+reads the exit code and the `identity:` line. `TestCompat` pins stdout, stderr, the exit code,
 every aws call in order and the stamp for each case.
 
 The command line runs on clikit: how help renders, how an argv error reads
