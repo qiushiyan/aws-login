@@ -1,0 +1,12 @@
+$ aws-login no-such-profile
+--- stdout
+--- stderr
+aws-login: no profile 'no-such-profile' in ~/.aws/config; known profiles:
+  default
+  planlab-dev
+  planlab-prod
+  planlab-legacy
+--- exit 2
+--- aws calls
+configure list-profiles
+--- stamps

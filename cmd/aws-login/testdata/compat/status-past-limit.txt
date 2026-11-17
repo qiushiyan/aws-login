@@ -1,0 +1,14 @@
+$ aws-login --status
+--- stdout
+profile:    planlab-prod (sso-session planlab)
+identity:   arn:aws:sts::000000000000:assumed-role/Stub/user
+signed in:  <time> (by aws-login)
+ends:       ~<time> — past the 8-hour limit; the role credentials still work until they expire, the next refresh will not
+--- stderr
+--- exit 0
+--- aws calls
+configure list-profiles
+configure get sso_session --profile planlab-prod
+sts get-caller-identity --profile planlab-prod --output text --query Arn
+--- stamps
+planlab: <epoch>

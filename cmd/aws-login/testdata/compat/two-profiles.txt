@@ -1,0 +1,7 @@
+$ aws-login planlab-dev planlab-prod
+--- stdout
+--- stderr
+aws-login: one profile at most (got 'planlab-dev' and 'planlab-prod')
+--- exit 2
+--- aws calls
+--- stamps

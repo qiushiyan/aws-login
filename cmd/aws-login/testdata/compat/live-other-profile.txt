@@ -1,0 +1,15 @@
+$ aws-login planlab-dev
+--- stdout
+already signed in; nothing signed out (every profile on sso-session planlab shares this sign-in)
+identity:   arn:aws:sts::000000000000:assumed-role/Stub/user
+signed in:  <time> (by aws-login)
+ends:       ~<time> (8-hour session, <h>h<m>m left)
+run 'aws-login planlab-dev --renew' to sign out and start a new 8-hour session
+--- stderr
+--- exit 0
+--- aws calls
+configure list-profiles
+configure get sso_session --profile planlab-dev
+sts get-caller-identity --profile planlab-dev --output text --query Arn
+--- stamps
+planlab: <epoch>

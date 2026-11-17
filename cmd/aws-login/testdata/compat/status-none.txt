@@ -1,0 +1,11 @@
+$ aws-login --status
+--- stdout
+profile:    planlab-prod (sso-session planlab)
+credentials: none — run: aws-login planlab-prod
+--- stderr
+--- exit 1
+--- aws calls
+configure list-profiles
+configure get sso_session --profile planlab-prod
+sts get-caller-identity --profile planlab-prod --output text --query Arn
+--- stamps

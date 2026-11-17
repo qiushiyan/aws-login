@@ -1,0 +1,13 @@
+$ aws-login 
+--- stdout
+already signed in; nothing signed out (every profile on sso-session planlab shares this sign-in)
+identity:   arn:aws:sts::000000000000:assumed-role/Stub/user
+signed in:  unknown (last sign-in was not through aws-login)
+run 'aws-login planlab-prod --renew' to sign out and start a new 8-hour session
+--- stderr
+--- exit 0
+--- aws calls
+configure list-profiles
+configure get sso_session --profile planlab-prod
+sts get-caller-identity --profile planlab-prod --output text --query Arn
+--- stamps

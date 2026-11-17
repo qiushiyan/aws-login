@@ -1,0 +1,12 @@
+$ aws-login planlab-dev --status
+--- stdout
+profile:    planlab-dev (sso-session planlab)
+identity:   arn:aws:sts::000000000000:assumed-role/Stub/user
+signed in:  unknown (last sign-in was not through aws-login)
+--- stderr
+--- exit 0
+--- aws calls
+configure list-profiles
+configure get sso_session --profile planlab-dev
+sts get-caller-identity --profile planlab-dev --output text --query Arn
+--- stamps

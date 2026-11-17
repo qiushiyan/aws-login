@@ -1,0 +1,12 @@
+$ aws-login planlab-legacy --status
+--- stdout
+profile:    planlab-legacy
+identity:   arn:aws:sts::000000000000:assumed-role/Stub/user
+signed in:  unknown (last sign-in was not through aws-login)
+--- stderr
+--- exit 0
+--- aws calls
+configure list-profiles
+configure get sso_session --profile planlab-legacy
+sts get-caller-identity --profile planlab-legacy --output text --query Arn
+--- stamps

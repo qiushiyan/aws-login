@@ -1,0 +1,21 @@
+$ aws-login 
+--- stdout
+==> aws sso logout (ends the current Identity Center session)
+Successfully signed out of all SSO profiles.
+==> aws sso login --profile planlab-prod
+Successfully logged into Start URL: https://example.invalid/start
+==> aws sts get-caller-identity --profile planlab-prod
+identity:   arn:aws:sts::000000000000:assumed-role/Stub/user
+signed in:  <time>
+ends:       ~<time> (8-hour session; run aws-login again after that)
+--- stderr
+--- exit 0
+--- aws calls
+configure list-profiles
+configure get sso_session --profile planlab-prod
+sts get-caller-identity --profile planlab-prod --output text --query Arn
+sso logout
+sso login --profile planlab-prod
+sts get-caller-identity --profile planlab-prod --output text --query Arn
+--- stamps
+planlab: <epoch>
