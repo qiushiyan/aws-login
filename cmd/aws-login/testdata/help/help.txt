@@ -1,0 +1,77 @@
+Usage: aws-login [<profile>] [flags]
+
+aws-login signs the AWS CLI in to an IAM Identity Center session, signing out first only when a new session is needed.
+
+All planlab profiles share one Identity Center session (the [sso-session
+planlab] block in ~/.aws/config), so while that session lives, every
+profile on it can get credentials, and signing in to one profile never
+needs to sign another out.
+
+aws-login first asks whether the profile already gets credentials. If it
+does, nothing is signed in or out: it prints the identity and when the
+session ends. If it does not, or with --renew, it runs aws sso logout, which
+ends the session on AWS's side and clears every profile's cached
+credentials, then aws sso login, then verifies with aws sts
+get-caller-identity and records the sign-in time. The sign-out is what
+gives the new session its full length: aws sso login alone reuses a
+session that is still alive, along with its end time. Expect the full
+sign-in, passkey included, after a sign-out; a sign-in that only asks to
+"Allow access" means the sign-out did not reach AWS and the old end time
+still holds.
+
+A session ends 8 hours after its sign-in, and the organisation sets that,
+not this tool. The role credentials a profile already holds keep working
+until they expire; the next refresh after the session ends fails, and the
+profile needs aws-login again.
+
+A failed sign-in leaves every profile on the session without credentials,
+since the old session was already ended. Exit 1 then means a person has to
+sign in; retrying without one only repeats the prompt.
+
+Each line of the report starts with a label (profile:, identity:, signed in:,
+ends:, credentials:); a run that signed in or found the profile working
+prints an identity: line.
+
+Arguments:
+  <profile>                  Profile from ~/.aws/config to sign in, or to report with --status
+                             (optional; default: planlab-prod).
+
+Flags:
+  -h, --help                 Show context-sensitive help.
+      --status               Report the profile's identity and when its session ends, without
+                             signing anything in or out. Exits 1 when the profile has no working
+                             credentials.
+      --renew                Sign out and start a new session even when the profile already works,
+                             to restart the session's clock. Every profile on the same sso-session
+                             loses its credentials until the sign-in succeeds.
+      --use-device-code      Sign in with a code entered in any browser instead of a browser
+                             redirect to this machine. Always on for the office minis, whose
+                             localhost the laptop's browser cannot reach.
+      --no-browser           Print the sign-in URL instead of opening a browser.
+      --session-hours=INT    Length of an Identity Center session, set by the organisation. Only the
+                             reported end time depends on it (default: 8; env:
+                             $AWS_LOGIN_SESSION_HOURS).
+
+Constraints:
+  At most one of --status, --renew.
+
+Files:
+  ~/.local/state/aws-login/<sso-session>
+      The sign-in time aws-login recorded, in Unix seconds, one file per
+      sso-session (per profile for a profile without one); under
+      $XDG_STATE_HOME when that is set. --status reads it; a sign-in made with
+      aws sso login directly is reported as unknown.
+  ~/.config/machine
+      mac, mini or mini2. A value starting with mini turns on
+      --use-device-code.
+
+Examples:
+  aws-login                      planlab-prod, signing in only if it has no credentials
+  aws-login planlab-personal     another account on the same session; nothing signed out
+  aws-login --renew              a new 8-hour session, whatever the current one has left
+  aws-login --status             identity and time left; exit 1 when nothing works
+
+Exit codes:
+  0    success
+  1    the sign-in or its verification failed, or --status found no working credentials
+  2    bad arguments, or a profile not in ~/.aws/config; nothing was signed out

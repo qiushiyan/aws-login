@@ -5,7 +5,7 @@ Successfully signed out of all SSO profiles.
 ==> aws sso login --profile planlab-prod
 --- stderr
 login stub: failing
-aws-login: login failed (exit 0); the old session is already ended, so 'planlab-prod' has no credentials until a login succeeds
+aws-login: error: login failed (exit 3); the old session is already ended, so 'planlab-prod' has no credentials until a login succeeds
 --- exit 1
 --- aws calls
 configure list-profiles

@@ -6,7 +6,7 @@ Successfully signed out of all SSO profiles.
 Successfully logged into Start URL: https://example.invalid/start
 ==> aws sts get-caller-identity --profile planlab-prod
 --- stderr
-aws-login: login reported success but 'planlab-prod' cannot get credentials; check the profile's account and role in ~/.aws/config
+aws-login: error: login reported success but 'planlab-prod' cannot get credentials; check the profile's account and role in ~/.aws/config
 --- exit 1
 --- aws calls
 configure list-profiles

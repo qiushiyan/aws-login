@@ -1,7 +1,9 @@
 $ aws-login planlab-dev planlab-prod
 --- stdout
 --- stderr
-aws-login: one profile at most (got 'planlab-dev' and 'planlab-prod')
+aws-login: error: unexpected argument planlab-prod
+Usage: aws-login [<profile>] [flags]
+Run "aws-login --help" for details.
 --- exit 2
 --- aws calls
 --- stamps

@@ -56,7 +56,7 @@ esac
 // world is a temporary HOME with the stub aws first on a PATH that holds no
 // real aws.
 type world struct {
-	t                    *testing.T
+	t                     *testing.T
 	home, stub, log, sess string
 }
 
